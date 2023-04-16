@@ -37,40 +37,80 @@
         height: 50px;
         border-radius: 50%;
         background-color: rgb(254, 0, 254);
-        filter: blur(10px);
       }
     </style>
   </head>
   <body>
     <div class="container">
       <div class="crosshair"></div>
+      <label for="numCircles">Number of circles:</label>
+      <input type="range" id="numCircles" min="1" max="36" value="12" />
+      <br />
+      <label for="radius">Radius:</label>
+      <input type="range" id="radius" min="50" max="500" value="200" />
+      <br />
+      <label for="interval">Interval:</label>
+      <input type="range" id="interval" min="10" max="500" value="100" />
+      <br />
+      <label for="blurry">Blurry:</label>
+      <input type="checkbox" id="blurry" checked />
     </div>
     <script>
-      const numCircles = 12;
-      const interval = 100;
-      const radius = Math.min(
-        Math.min(window.innerWidth, window.innerHeight) / 3,
-        200
-      );
-      let circles = [];
-      for (let i = 0; i < numCircles; i++) {
-        const circle = document.createElement('div');
-        circle.classList.add('circle');
-        circle.id = `circle-${i}`;
-        document.querySelector('.container').appendChild(circle);
-        circles.push(circle);
+      let numCircles = parseInt(document.querySelector('#numCircles').value);
+      let radius = parseInt(document.querySelector('#radius').value);
+      let interval = parseInt(document.querySelector('#interval').value);
+      let blurry = document.querySelector('#blurry').checked;
 
-        const angle = (i * 2 * Math.PI) / numCircles;
-        const x = radius * Math.cos(angle);
-        const y = radius * Math.sin(angle);
-        circle.style.transform = `translate(${x}px, ${y}px)`;
+      let circles = [];
+      let timer = -1;
+
+      function startAnimation() {
+        clearInterval(timer);
+        circles.forEach((circle) => circle.remove());
+        circles = [];
+        for (let i = 0; i < numCircles; i++) {
+          const circle = document.createElement('div');
+          circle.classList.add('circle');
+          circle.id = `circle-${i}`;
+          circle.style.filter = blurry ? 'blur(10px)' : 'none';
+          const angle = (i * 2 * Math.PI) / numCircles;
+          const x = radius * Math.cos(angle);
+          const y = radius * Math.sin(angle);
+          circle.style.transform = `translate(${x}px, ${y}px)`;
+          document.querySelector('.container').appendChild(circle);
+          circles.push(circle);
+        }
+        let currentCircle = 0;
+        timer = setInterval(() => {
+          circles[currentCircle].style.visibility = 'visible';
+          currentCircle = (currentCircle + 1) % numCircles;
+          circles[currentCircle].style.visibility = 'hidden';
+        }, interval);
       }
-      let currentCircle = 0;
-      setInterval(() => {
-        circles[currentCircle].style.visibility = 'visible';
-        currentCircle = (currentCircle + 1) % numCircles;
-        circles[currentCircle].style.visibility = 'hidden';
-      }, interval);
+
+      document
+        .querySelector('#numCircles')
+        .addEventListener('input', (event) => {
+          numCircles = parseInt(event.target.value);
+          startAnimation();
+        });
+
+      document.querySelector('#radius').addEventListener('input', (event) => {
+        radius = parseInt(event.target.value);
+        startAnimation();
+      });
+
+      document.querySelector('#interval').addEventListener('input', (event) => {
+        interval = parseInt(event.target.value);
+        startAnimation();
+      });
+
+      document.querySelector('#blurry').addEventListener('change', (event) => {
+        blurry = event.target.checked;
+        startAnimation();
+      });
+
+      startAnimation();
     </script>
   </body>
 </html>
