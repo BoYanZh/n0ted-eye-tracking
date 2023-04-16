@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: rgb(211, 210, 213);
+      }
+      .container {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+      }
+      .crosshair {
+        position: absolute;
+        top: calc(50% - 10px);
+        left: calc(50% - 3px);
+        width: 6px;
+        height: 20px;
+        background-color: black;
+      }
+      .crosshair::before {
+        content: '';
+        position: absolute;
+        top: 7px;
+        left: -7px;
+        width: 20px;
+        height: 6px;
+        background-color: black;
+      }
+      .circle {
+        position: absolute;
+        top: calc(50% - 25px);
+        left: calc(50% - 25px);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: rgb(254, 0, 254);
+        filter: blur(10px);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="crosshair"></div>
+    </div>
+    <script>
+      const numCircles = 12;
+      const interval = 100;
+      const radius = Math.min(
+        Math.min(window.innerWidth, window.innerHeight) / 3,
+        200
+      );
+      let circles = [];
+      for (let i = 0; i < numCircles; i++) {
+        const circle = document.createElement('div');
+        circle.classList.add('circle');
+        circle.id = `circle-${i}`;
+        document.querySelector('.container').appendChild(circle);
+        circles.push(circle);
+
+        const angle = (i * 2 * Math.PI) / numCircles;
+        const x = radius * Math.cos(angle);
+        const y = radius * Math.sin(angle);
+        circle.style.transform = `translate(${x}px, ${y}px)`;
+      }
+      let currentCircle = 0;
+      setInterval(() => {
+        circles[currentCircle].style.visibility = 'visible';
+        currentCircle = (currentCircle + 1) % numCircles;
+        circles[currentCircle].style.visibility = 'hidden';
+      }, interval);
+    </script>
+  </body>
+</html>
